@@ -16,7 +16,7 @@ def test_predict():
     dataset = map(lambda data: data.split(','), dataset)
 
     split = 2*len(dataset)/3
-    trial_count = 20
+    trial_count = 100
     correct_ratio = 0
 
     for _ in xrange(trial_count):
@@ -37,7 +37,7 @@ def test_predict():
             probability = tree.predict(feature)
             maxlabel = max(probability.iteritems(), key=operator.itemgetter(1))[0]
             correct += 1.0 if label == maxlabel else 0.0
-        print correct/len(test_data)
         correct_ratio += 100.0 * correct / len(test_data)
     correct_ratio /= trial_count
+    print correct_ratio
     assert correct_ratio >= 70.0, "sometimes fials."

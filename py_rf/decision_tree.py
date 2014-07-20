@@ -30,17 +30,24 @@ class DecisionTree:
         self.root = self.recursive(numpy.array(features))
 
 
-    def __init__(self):
+    def __init__(self, max_depth = 7):
         # TODO: gain function option
-        # TODO: depth option
         # gini
         self.gain_function = lambda probabilities: 1.0 - numpy.sum(numpy.multiply(probabilities, probabilities))
+        self.max_depth = max_depth
         pass
 
     def recursive(self, features, depth = 0):
-        medians = map(lambda vector: numpy.median(vector), features.transpose()[0:-1])
+        node = DecisionNode()
 
         classes = features.transpose()[-1]
+        if depth is self.max_depth:
+            node.is_leaf = True
+            node.classes = numpy.bincount(classes.astype('int64'), minlength = self.num_class)
+            return node
+
+        medians = map(lambda vector: numpy.median(vector), features.transpose()[0:-1])
+
         gains = []
         for attr, median in enumerate(medians):
             variables = features.transpose()[attr]
@@ -51,7 +58,6 @@ class DecisionTree:
             upper_gain = self.gain_function(upper_count/(1.0*features.shape[0]))*numpy.sum(upper_count)
             gains.append(lower_gain + upper_gain)
 
-        node = DecisionNode()
         node.attr = numpy.argmax(gains)
         node.value = medians[node.attr]
 
