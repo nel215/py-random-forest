@@ -46,6 +46,7 @@ class DecisionTree:
             node.classes = numpy.bincount(classes.astype('int64'), minlength = self.num_class)
             return node
 
+        # TODO: split multi pivot
         medians = map(lambda vector: numpy.median(vector), features.transpose()[0:-1])
 
         gains = []
