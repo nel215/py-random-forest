@@ -6,10 +6,11 @@ import requests
 import numpy
 
 class RandomForest:
-    def __init__(self, num_tree=10):
+    def __init__(self, num_tree=10, max_depth=5):
         self.num_tree = num_tree
+        self.max_depth = max_depth
         self.attribute_indices_list = []
-        self.trees = [DecisionTree(max_depth=6) for i in xrange(self.num_tree)]
+        self.trees = [DecisionTree(max_depth=self.max_depth) for i in xrange(self.num_tree)]
 
 
     def build(self, features, labels):
