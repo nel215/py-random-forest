@@ -1,13 +1,9 @@
-#coding:utf-8
+#conding: utf-8
 
-from py_rf.decision_tree import DecisionTree
+from py_rf.random_forest import RandomForest
+import operator
 import requests
 import random
-import sys
-import operator
-
-def test_create_decision_tree():
-    tree = DecisionTree()
 
 
 def test_predict():
@@ -16,7 +12,7 @@ def test_predict():
     dataset = map(lambda data: data.split(','), dataset)
 
     split = 2*len(dataset)/3
-    trial_count = 50
+    trial_count = 30
     correct_ratio = 0
 
     for _ in xrange(trial_count):
@@ -27,17 +23,19 @@ def test_predict():
         features = map(lambda data: map(float, data[:-1]), train_data)
         labels = map(lambda data: data[-1], train_data)
 
-        tree = DecisionTree()
-        tree.build(features, labels)
+        forest = RandomForest()
+        forest.build(features, labels)
 
         correct = 0
         for data in test_data:
             feature = map(float, data[:-1])
             label = data[-1]
-            probability = tree.predict(feature)
+            probability = forest.predict(feature)
             maxlabel = max(probability.iteritems(), key=operator.itemgetter(1))[0]
             correct += 1.0 if label == maxlabel else 0.0
         correct_ratio += 100.0 * correct / len(test_data)
     correct_ratio /= trial_count
     print correct_ratio
-    assert correct_ratio >= 70.0, "sometime fial."
+    assert correct_ratio >= 85.0, "sometime fail."
+
+
