@@ -55,8 +55,8 @@ class DecisionTree:
             lower_count = numpy.bincount(classes.take(numpy.where(variables <= median))[0].astype('int64'), minlength = self.num_class)
             upper_count = numpy.bincount(classes.take(numpy.where(variables >  median))[0].astype('int64'), minlength = self.num_class)
 
-            lower_gain = self.gain_function(lower_count/(1.0*features.shape[0]))*numpy.sum(lower_count)
-            upper_gain = self.gain_function(upper_count/(1.0*features.shape[0]))*numpy.sum(upper_count)
+            lower_gain = -self.gain_function(lower_count/(1.0*features.shape[0]))*numpy.sum(lower_count)
+            upper_gain = -self.gain_function(upper_count/(1.0*features.shape[0]))*numpy.sum(upper_count)
             gains.append(lower_gain + upper_gain)
 
         node.attr = numpy.argmax(gains)

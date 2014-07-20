@@ -27,7 +27,7 @@ def test_predict():
         features = map(lambda data: map(float, data[:-1]), train_data)
         labels = map(lambda data: data[-1], train_data)
 
-        tree = DecisionTree()
+        tree = DecisionTree(max_depth=5)
         tree.build(features, labels)
 
         correct = 0
@@ -40,4 +40,4 @@ def test_predict():
         correct_ratio += 100.0 * correct / len(test_data)
     correct_ratio /= trial_count
     print correct_ratio
-    assert correct_ratio >= 70.0, "sometime fial."
+    assert correct_ratio >= 80.0, "sometime fial."
