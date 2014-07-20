@@ -14,6 +14,7 @@ def get_label_to_class_dictionary(labels):
 class DecisionNode:
     def __init__(self):
         self.is_leaf = False
+        self.attr = None
         self.leff_child  = None
         self.right_child = None
         self.classes = None
@@ -50,30 +51,35 @@ class DecisionTree:
             upper_gain = self.gain_function(upper_count/(1.0*features.shape[0]))*numpy.sum(upper_count)
             gains.append(lower_gain + upper_gain)
 
-        select_attr = numpy.argmax(gains)
-
-        lower_select = numpy.where(features.transpose()[select_attr] <= medians[select_attr])[0].astype('int64')
-        upper_select = numpy.where(features.transpose()[select_attr] >  medians[select_attr])[0].astype('int64')
-
         node = DecisionNode()
+        node.attr = numpy.argmax(gains)
+        node.value = medians[node.attr]
+
+        lower_select = numpy.where(features.transpose()[node.attr] <= node.value)[0].astype('int64')
+        upper_select = numpy.where(features.transpose()[node.attr] >  node.value)[0].astype('int64')
+
 
         if lower_select.shape[0] is 0 or upper_select.shape[0] is 0:
             node.is_leaf = True
-            node.classes = classes
+            node.classes = numpy.bincount(classes.astype('int64'), minlength = self.num_class)
             return node
 
-        node.left_child = self.recursive(features.take(lower_select, axis=0), depth + 1)
-        node.left_child = self.recursive(features.take(upper_select, axis=0), depth + 1)
+        node.left_child  = self.recursive(features.take(lower_select, axis=0), depth + 1)
+        node.right_child = self.recursive(features.take(upper_select, axis=0), depth + 1)
 
         return node
 
 
-if __name__=='__main__':
-    dataset = requests.get('https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data').text.split('\n')
-    dataset = filter(lambda data: len(data) > 1, dataset)
-    dataset = map(lambda data: data.split(','), dataset)
-    features = map(lambda data: map(float, data[:-1]), dataset)
-    labels = map(lambda data: data[-1], dataset)
+    def predict(self, feature):
+        node = self.root
+        while not node.is_leaf:
+            node = node.left_child if feature[node.attr] <= node.value else node.right_child
+        probability = {}
+        for i, count in enumerate(node.classes):
+            probability[self.class_to_label_dictionary[i]] = count/numpy.sum(node.classes)
+        return probability
 
-    tree = DecisionTree()
-    tree.build(features, labels)
+
+if __name__=='__main__':
+    pass
+
